@@ -59,15 +59,15 @@ public class FirebaseUserService {
 
         UserRecord.UpdateRequest request = new UpdateRequest(dto.id().toString());
 
-        if (dto.email() != null && StringUtils.isNotBlank(dto.email())) {
+        if (StringUtils.isNotBlank(dto.email())) {
             request.setEmail(dto.email());
         }
 
-        if (dto.nomeCompleto() != null && StringUtils.isNotBlank(dto.nomeCompleto())) {
+        if (StringUtils.isNotBlank(dto.nomeCompleto())) {
             request.setDisplayName(dto.nomeCompleto());
         }
 
-        if (dto.telefone() != null && StringUtils.isNotBlank(dto.telefone())) {
+        if (StringUtils.isNotBlank(dto.telefone())) {
             request.setPhoneNumber(dto.telefone());
         }
 
@@ -89,6 +89,8 @@ public class FirebaseUserService {
     public void deleteUserInFirebase(String email) {
 
         try {
+
+            log.info("FIREBASE: Apagar usuário e-mail: {}", email);
 
             if (!userAlreadyExistsInFirestore(email)) {
                 throw new UsuarioException("Usuário com e-mail: %s não existe".formatted(email), HttpStatus.NOT_FOUND);

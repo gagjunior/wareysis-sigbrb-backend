@@ -16,6 +16,12 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(e.getStatus(), e.getMessage());
     }
 
+    @ExceptionHandler(TipoPerfilException.class)
+    public ResponseEntity<ExceptionResponseDto> handleUsuarioException(TipoPerfilException e) {
+
+        return buildResponseEntity(e.getStatus(), e.getMessage());
+    }
+
     private ResponseEntity<ExceptionResponseDto> buildResponseEntity(HttpStatus status, String message) {
 
         return ResponseEntity

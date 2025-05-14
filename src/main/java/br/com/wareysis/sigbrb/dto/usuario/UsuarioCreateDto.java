@@ -1,9 +1,13 @@
 package br.com.wareysis.sigbrb.dto.usuario;
 
 import java.io.Serializable;
+import java.util.List;
+
+import br.com.wareysis.sigbrb.dto.tipos.TipoPerfilDto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 public record UsuarioCreateDto(
 
@@ -15,7 +19,10 @@ public record UsuarioCreateDto(
         String email,
 
         @NotBlank(message = "Senha não pode ser null ou em branco")
-        String senha
+        String senha,
+
+        @NotEmpty(message = "Lista de perfis não pode ser null ou vazia")
+        List<TipoPerfilDto> perfis
 
 ) implements Serializable {
 

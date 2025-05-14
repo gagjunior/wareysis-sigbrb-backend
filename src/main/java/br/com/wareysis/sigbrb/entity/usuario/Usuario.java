@@ -1,7 +1,8 @@
 package br.com.wareysis.sigbrb.entity.usuario;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
+
+import br.com.wareysis.sigbrb.core.entity.AbstractEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +12,6 @@ import lombok.Setter;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Getter
@@ -22,7 +21,7 @@ import jakarta.persistence.Table;
 @AllArgsConstructor
 @Entity
 @Table(name = "USUARIOS")
-public class Usuario {
+public class Usuario extends AbstractEntity {
 
     @Id
     private UUID id;
@@ -40,22 +39,5 @@ public class Usuario {
     private Boolean habilitado;
 
     private Boolean alterarSenha;
-
-    private LocalDateTime dhCriacao;
-
-    private LocalDateTime dhAlteracao;
-
-    @PrePersist
-    public void prePersist() {
-
-        dhCriacao = LocalDateTime.now();
-        dhAlteracao = dhCriacao;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-
-        dhAlteracao = LocalDateTime.now();
-    }
 
 }

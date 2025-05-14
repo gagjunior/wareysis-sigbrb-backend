@@ -2,7 +2,6 @@ package br.com.wareysis.sigbrb.controller.usuario;
 
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,21 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.wareysis.sigbrb.dto.endpoint.PagedResponse;
 import br.com.wareysis.sigbrb.dto.endpoint.PaginationDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioCreateDto;
+import br.com.wareysis.sigbrb.dto.usuario.UsuarioResponseDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioUpdateDto;
-import br.com.wareysis.sigbrb.entity.usuario.Usuario;
 import br.com.wareysis.sigbrb.service.usuario.UsuarioService;
+
+import lombok.RequiredArgsConstructor;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/usuarios")
+@RequiredArgsConstructor
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService service;
+    private final UsuarioService service;
 
     @PostMapping
-    public ResponseEntity<Usuario> create(@Valid @RequestBody UsuarioCreateDto dto) {
+    public ResponseEntity<UsuarioResponseDto> create(@Valid @RequestBody UsuarioCreateDto dto) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -40,7 +41,7 @@ public class UsuarioController {
     }
 
     @PutMapping
-    public ResponseEntity<Usuario> update(@Valid @RequestBody UsuarioUpdateDto dto) {
+    public ResponseEntity<UsuarioResponseDto> update(@Valid @RequestBody UsuarioUpdateDto dto) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -58,7 +59,7 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedResponse<Usuario>> findAll(@ModelAttribute PaginationDto paginationDto) {
+    public ResponseEntity<PagedResponse<UsuarioResponseDto>> findAll(@ModelAttribute PaginationDto paginationDto) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -66,7 +67,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/nome/{nomeCompleto}")
-    public ResponseEntity<PagedResponse<Usuario>> findByNomeCompleto(
+    public ResponseEntity<PagedResponse<UsuarioResponseDto>> findByNomeCompleto(
             @PathVariable(name = "nomeCompleto") String nomeCompleto,
             @ModelAttribute PaginationDto paginationDto
     ) {
@@ -77,7 +78,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<Usuario> findById(@PathVariable(name = "id") String id) {
+    public ResponseEntity<UsuarioResponseDto> findById(@PathVariable(name = "id") String id) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -85,7 +86,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<Usuario> findByEmail(@PathVariable(name = "email") String email) {
+    public ResponseEntity<UsuarioResponseDto> findByEmail(@PathVariable(name = "email") String email) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)

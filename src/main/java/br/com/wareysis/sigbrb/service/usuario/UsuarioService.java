@@ -1,48 +1,71 @@
 package br.com.wareysis.sigbrb.service.usuario;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.auth.UserRecord;
 
 import br.com.wareysis.sigbrb.dto.endpoint.PagedResponse;
 import br.com.wareysis.sigbrb.dto.endpoint.PaginationDto;
+import br.com.wareysis.sigbrb.dto.tipos.TipoPerfilDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioCreateDto;
+import br.com.wareysis.sigbrb.dto.usuario.UsuarioResponseDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioUpdateDto;
 import br.com.wareysis.sigbrb.entity.usuario.Usuario;
+import br.com.wareysis.sigbrb.entity.usuario.UsuarioPerfil;
 import br.com.wareysis.sigbrb.exception.UsuarioException;
 import br.com.wareysis.sigbrb.mapper.usuario.UsuarioMapper;
 import br.com.wareysis.sigbrb.repository.usuario.UsuarioRepository;
 import br.com.wareysis.sigbrb.service.firebase.FirebaseUserService;
+import br.com.wareysis.sigbrb.service.tipos.TipoPerfilService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository repository;
+    private final UsuarioRepository repository;
 
-    @Autowired
-    private FirebaseUserService firebaseUserService;
+    private final UsuarioPerfilService usuarioPerfilService;
 
-    @Autowired
-    private UsuarioMapper mapper;
+    private final FirebaseUserService firebaseUserService;
 
-    public Usuario create(UsuarioCreateDto dto) {
+    private final UsuarioMapper mapper;
+
+    private final TipoPerfilService tipoPerfilService;
+
+    @Transactional
+    public UsuarioResponseDto create(UsuarioCreateDto dto) {
 
         UserRecord userRecord = firebaseUserService.createUserInFirebase(dto);
 
-        Usuario usuario = mapper.fromUserRecord(userRecord);
+        try {
 
-        return repository.save(usuario);
+            Usuario usuario = repository.saveAndFlush(mapper.fromUserRecord(userRecord));
+
+            List<UsuarioPerfil> perfilList = usuarioPerfilService.create(usuario.getId(), dto.perfis());
+
+            return createResponseDto(usuario, perfilList);
+
+        } catch (Exception e) {
+
+            firebaseUserService.deleteUserInFirebase(dto.email());
+
+            throw new UsuarioException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
     }
 
-    public Usuario update(UsuarioUpdateDto dto) {
+    @Transactional
+    public UsuarioResponseDto update(UsuarioUpdateDto dto) {
 
         Usuario usuario = repository.findById(dto.id())
                 .orElseThrow(() -> new UsuarioException("Usuário com ID: %s não localizado".formatted(dto.id()), HttpStatus.BAD_REQUEST));
@@ -54,7 +77,7 @@ public class UsuarioService {
         usuario.setTelefone(userRecord.getPhoneNumber());
         usuario.setHabilitado(!userRecord.isDisabled());
 
-        if (dto.cpf() != null && StringUtils.isNotBlank(dto.cpf())) {
+        if (StringUtils.isNotBlank(dto.cpf())) {
             usuario.setCpf(dto.cpf());
         }
 
@@ -62,10 +85,13 @@ public class UsuarioService {
             usuario.setAlterarSenha(dto.alterarSenha());
         }
 
-        return repository.save(usuario);
+        repository.save(usuario);
+
+        return createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId()));
 
     }
 
+    @Transactional
     public void delete(UUID id) {
 
         Usuario usuario = repository.findById(id)
@@ -77,31 +103,49 @@ public class UsuarioService {
 
     }
 
-    public PagedResponse<Usuario> findAll(PaginationDto paginationDto) {
+    public PagedResponse<UsuarioResponseDto> findAll(PaginationDto paginationDto) {
 
         Page<Usuario> page = repository.findAll(paginationDto.toPageable());
 
-        return new PagedResponse<>(page);
+        Page<UsuarioResponseDto> pageResponseDto = page.map(usuario -> createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId())));
+
+        return new PagedResponse<>(pageResponseDto);
     }
 
-    public PagedResponse<Usuario> findByNomeCompleto(String nomeCompleto, PaginationDto paginationDto) {
+    public PagedResponse<UsuarioResponseDto> findByNomeCompleto(String nomeCompleto, PaginationDto paginationDto) {
 
         Page<Usuario> page = repository.findByNomeCompletoContainingIgnoreCase(nomeCompleto, paginationDto.toPageable());
 
-        return new PagedResponse<>(page);
+        Page<UsuarioResponseDto> pageResponseDto = page.map(usuario -> createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId())));
+
+        return new PagedResponse<>(pageResponseDto);
 
     }
 
-    public Usuario findByEmail(String email) {
+    public UsuarioResponseDto findByEmail(String email) {
 
-        return repository.findByEmail(email)
+        Usuario usuario = repository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioException("Usuário com e-mail: %s não existe".formatted(email), HttpStatus.BAD_REQUEST));
+
+        return createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId()));
     }
 
-    public Usuario findById(UUID id) {
+    public UsuarioResponseDto findById(UUID id) {
 
-        return repository.findById(id)
+        Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new UsuarioException("Usuário com id: %s não existe".formatted(id), HttpStatus.BAD_REQUEST));
+
+        return createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId()));
+    }
+
+    private UsuarioResponseDto createResponseDto(Usuario usuario, List<UsuarioPerfil> perfilList) {
+
+        List<TipoPerfilDto> tipoPerfilList = new ArrayList<>();
+
+        perfilList.forEach(perfil -> tipoPerfilList.add(tipoPerfilService.findById(perfil.getId().idPerfil())));
+
+        return mapper.toResponseDto(usuario, tipoPerfilList);
+
     }
 
 }
