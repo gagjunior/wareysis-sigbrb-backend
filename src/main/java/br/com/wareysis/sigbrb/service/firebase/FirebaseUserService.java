@@ -86,6 +86,24 @@ public class FirebaseUserService {
 
     }
 
+    public void deleteUserInFirebase(String email) {
+
+        try {
+
+            if (!userAlreadyExistsInFirestore(email)) {
+                throw new UsuarioException("Usuário com e-mail: %s não existe".formatted(email), HttpStatus.NOT_FOUND);
+            }
+
+            UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
+            FirebaseAuth.getInstance().deleteUser(userRecord.getUid());
+
+        } catch (FirebaseAuthException e) {
+
+            throw new UsuarioException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     public boolean userAlreadyExistsInFirestore(String email) {
 
         try {
