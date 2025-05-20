@@ -15,16 +15,14 @@ import br.com.wareysis.sigbrb.exception.TipoPerfilException;
 import br.com.wareysis.sigbrb.repository.usuario.UsuarioPerfilRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UsuarioPerfilService {
 
     private final UsuarioPerfilRepository repository;
 
-    public List<UsuarioPerfil> create(UUID idUsuario, List<TipoPerfilDto> perfis) {
+    public List<UsuarioPerfil> createPerfisUsuario(UUID idUsuario, List<TipoPerfilDto> perfis) {
 
         try {
 
@@ -44,7 +42,7 @@ public class UsuarioPerfilService {
 
             });
 
-            return repository.saveAllAndFlush(usuarioPerfilList);
+            return repository.saveAll(usuarioPerfilList);
 
         } catch (Exception e) {
 
@@ -53,10 +51,14 @@ public class UsuarioPerfilService {
 
     }
 
-    public List<UsuarioPerfil> findByUsuarioId(UUID idUsuario) {
+    public List<UsuarioPerfil> findPerfisByIdUsuario(UUID idUsuario) {
 
         return repository.findById_IdUsuario(idUsuario).orElse(Collections.emptyList());
 
     }
 
+    public boolean existsUsuarioPerfilById(UsuarioPerfilId id) {
+
+        return repository.existsUsuarioPerfilById(id);
+    }
 }

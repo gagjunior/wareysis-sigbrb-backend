@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.wareysis.sigbrb.dto.tipos.TipoPerfilDto;
 import br.com.wareysis.sigbrb.service.tipos.TipoPerfilService;
+import br.com.wareysis.sigbrb.service.usuario.UsuarioAuthService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,8 +21,12 @@ public class TipoPerfilController {
 
     private final TipoPerfilService service;
 
+    private final UsuarioAuthService usuarioAuthService;
+
     @GetMapping
     public ResponseEntity<List<TipoPerfilDto>> findAll() {
+
+        usuarioAuthService.adminUserIsRequired();
 
         return ResponseEntity.ok(service.findAll());
     }
@@ -29,11 +34,15 @@ public class TipoPerfilController {
     @GetMapping("/nome/{nome}")
     public ResponseEntity<List<TipoPerfilDto>> findByNome(@PathVariable(name = "nome") String nome) {
 
+        usuarioAuthService.adminUserIsRequired();
+
         return ResponseEntity.ok(service.findByNome(nome));
     }
 
     @GetMapping("/id/{id}")
     public ResponseEntity<TipoPerfilDto> findById(@PathVariable(name = "id") String id) {
+
+        usuarioAuthService.adminUserIsRequired();
 
         return ResponseEntity.ok(service.findById(id));
     }

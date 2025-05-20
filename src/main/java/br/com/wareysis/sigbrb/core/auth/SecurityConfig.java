@@ -1,7 +1,5 @@
 package br.com.wareysis.sigbrb.core.auth;
 
-// SecurityConfig.java
-
 import java.io.IOException;
 
 import org.springframework.context.annotation.Bean;
@@ -19,6 +17,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
@@ -28,14 +29,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/usuarios/registro").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new FirebaseAuthenticationFilter(),
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new FirebaseAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -43,8 +42,8 @@ public class SecurityConfig {
     public static class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
         @Override
-        protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response,
-                jakarta.servlet.FilterChain filterChain) throws jakarta.servlet.ServletException, IOException {
+        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+                throws ServletException, IOException {
 
             String header = request.getHeader("Authorization");
 

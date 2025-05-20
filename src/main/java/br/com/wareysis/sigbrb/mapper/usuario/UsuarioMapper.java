@@ -3,7 +3,7 @@ package br.com.wareysis.sigbrb.mapper.usuario;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.google.firebase.auth.UserRecord;
 
@@ -11,7 +11,7 @@ import br.com.wareysis.sigbrb.dto.tipos.TipoPerfilDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioResponseDto;
 import br.com.wareysis.sigbrb.entity.usuario.Usuario;
 
-@Service
+@Component
 public class UsuarioMapper {
 
     public Usuario fromUserRecord(UserRecord userRecord) {

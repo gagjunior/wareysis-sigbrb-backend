@@ -1,11 +1,11 @@
 package br.com.wareysis.sigbrb.mapper.tipos;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import br.com.wareysis.sigbrb.dto.tipos.TipoPerfilDto;
 import br.com.wareysis.sigbrb.entity.tipos.TipoPerfil;
 
-@Service
+@Component
 public class TipoPerfilMapper {
 
     public TipoPerfilDto toDto(TipoPerfil tipoPerfil) {

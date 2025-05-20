@@ -17,4 +17,6 @@ public interface UsuarioPerfilRepository extends JpaRepository<UsuarioPerfil, Us
 
     Optional<List<UsuarioPerfil>> findById_IdUsuario(UUID idUsuario);
 
+    boolean existsUsuarioPerfilById(UsuarioPerfilId id);
+
 }

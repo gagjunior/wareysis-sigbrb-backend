@@ -49,9 +49,9 @@ public class UsuarioService {
 
         try {
 
-            Usuario usuario = repository.saveAndFlush(mapper.fromUserRecord(userRecord));
+            Usuario usuario = repository.save(mapper.fromUserRecord(userRecord));
 
-            List<UsuarioPerfil> perfilList = usuarioPerfilService.create(usuario.getId(), dto.perfis());
+            List<UsuarioPerfil> perfilList = usuarioPerfilService.createPerfisUsuario(usuario.getId(), dto.perfis());
 
             return createResponseDto(usuario, perfilList);
 
@@ -87,7 +87,7 @@ public class UsuarioService {
 
         repository.save(usuario);
 
-        return createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId()));
+        return createResponseDto(usuario, usuarioPerfilService.findPerfisByIdUsuario(usuario.getId()));
 
     }
 
@@ -107,7 +107,7 @@ public class UsuarioService {
 
         Page<Usuario> page = repository.findAll(paginationDto.toPageable());
 
-        Page<UsuarioResponseDto> pageResponseDto = page.map(usuario -> createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId())));
+        Page<UsuarioResponseDto> pageResponseDto = page.map(usuario -> createResponseDto(usuario, usuarioPerfilService.findPerfisByIdUsuario(usuario.getId())));
 
         return new PagedResponse<>(pageResponseDto);
     }
@@ -116,7 +116,7 @@ public class UsuarioService {
 
         Page<Usuario> page = repository.findByNomeCompletoContainingIgnoreCase(nomeCompleto, paginationDto.toPageable());
 
-        Page<UsuarioResponseDto> pageResponseDto = page.map(usuario -> createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId())));
+        Page<UsuarioResponseDto> pageResponseDto = page.map(usuario -> createResponseDto(usuario, usuarioPerfilService.findPerfisByIdUsuario(usuario.getId())));
 
         return new PagedResponse<>(pageResponseDto);
 
@@ -127,7 +127,7 @@ public class UsuarioService {
         Usuario usuario = repository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioException("Usuário com e-mail: %s não existe".formatted(email), HttpStatus.BAD_REQUEST));
 
-        return createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId()));
+        return createResponseDto(usuario, usuarioPerfilService.findPerfisByIdUsuario(usuario.getId()));
     }
 
     public UsuarioResponseDto findById(UUID id) {
@@ -135,7 +135,7 @@ public class UsuarioService {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new UsuarioException("Usuário com id: %s não existe".formatted(id), HttpStatus.BAD_REQUEST));
 
-        return createResponseDto(usuario, usuarioPerfilService.findByUsuarioId(usuario.getId()));
+        return createResponseDto(usuario, usuarioPerfilService.findPerfisByIdUsuario(usuario.getId()));
     }
 
     private UsuarioResponseDto createResponseDto(Usuario usuario, List<UsuarioPerfil> perfilList) {

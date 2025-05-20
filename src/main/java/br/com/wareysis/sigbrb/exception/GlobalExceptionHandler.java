@@ -22,6 +22,12 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(e.getStatus(), e.getMessage());
     }
 
+    @ExceptionHandler(ServicoException.class)
+    public ResponseEntity<ExceptionResponseDto> handleUsuarioException(ServicoException e) {
+
+        return buildResponseEntity(e.getStatus(), e.getMessage());
+    }
+
     private ResponseEntity<ExceptionResponseDto> buildResponseEntity(HttpStatus status, String message) {
 
         return ResponseEntity
