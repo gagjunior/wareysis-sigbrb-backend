@@ -42,13 +42,20 @@ public class ServicoService {
     @Transactional
     public ServicoDto update(ServicoUpdateDto dto) {
 
-        Servico servico = repository.findById(dto.id())
-                .orElseThrow(() -> new ServicoException("Não existe serviço com ID: %s".formatted(dto.id()), HttpStatus.BAD_REQUEST));
+        Servico servico = findById(dto.id());
 
         updateServicoDetais(servico, dto);
 
         return mapper.toDto(repository.save(servico));
 
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+
+        Servico servico = findById(id);
+
+        repository.delete(servico);
     }
 
     public List<ServicoDto> findAll() {
@@ -63,10 +70,14 @@ public class ServicoService {
 
     public ServicoDto findById(String id) {
 
-        Servico servico = repository.findById(UUID.fromString(id))
+        return mapper.toDto(findById(UUID.fromString(id)));
+    }
+
+    private Servico findById(UUID id) {
+
+        return repository.findById(id)
                 .orElseThrow(() -> new ServicoException("Serviço com ID: %s não existe".formatted(id), HttpStatus.BAD_REQUEST));
 
-        return mapper.toDto(servico);
     }
 
     private void updateServicoDetais(Servico servico, ServicoUpdateDto dto) {
