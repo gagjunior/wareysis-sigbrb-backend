@@ -1,5 +1,6 @@
 package br.com.wareysis.sigbrb.entity.servico;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ import jakarta.persistence.Table;
 @AllArgsConstructor
 @Entity
 @Table(name = "SERVICOS")
-public class Servico extends AbstractEntity {
+public class Servico extends AbstractEntity implements Serializable {
 
     @Id
     @GeneratedValue

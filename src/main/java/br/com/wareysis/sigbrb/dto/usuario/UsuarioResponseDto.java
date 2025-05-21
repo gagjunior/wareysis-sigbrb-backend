@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import br.com.wareysis.sigbrb.dto.tipos.TipoPerfilDto;
+import br.com.wareysis.sigbrb.dto.tipos.TipoDto;
 
 public record UsuarioResponseDto(
 
@@ -17,7 +17,7 @@ public record UsuarioResponseDto(
         Boolean emailVerificado,
         Boolean habilitado,
         Boolean alterarSenha,
-        List<TipoPerfilDto> perfis,
+        List<TipoDto> perfis,
         LocalDateTime dhCriacao,
         LocalDateTime dhAlteracao
 

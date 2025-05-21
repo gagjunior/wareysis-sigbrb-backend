@@ -1,6 +1,5 @@
 package br.com.wareysis.sigbrb.core.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import lombok.Getter;
@@ -14,7 +13,7 @@ import jakarta.persistence.PreUpdate;
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class AbstractEntity implements Serializable {
+public abstract class AbstractEntity {
 
     @Column(name = "DH_CRIACAO")
     LocalDateTime dhCriacao;

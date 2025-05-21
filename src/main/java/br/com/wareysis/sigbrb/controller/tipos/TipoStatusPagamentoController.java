@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.wareysis.sigbrb.dto.tipos.TipoDto;
-import br.com.wareysis.sigbrb.service.tipos.TipoPerfilService;
+import br.com.wareysis.sigbrb.service.tipos.TipoStatusPagamentoService;
 import br.com.wareysis.sigbrb.service.usuario.UsuarioAuthService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/tipos/perfil")
+@RequestMapping("/tipos/status-pagamento")
 @RequiredArgsConstructor
-public class TipoPerfilController {
+public class TipoStatusPagamentoController {
 
-    private final TipoPerfilService service;
+    private final TipoStatusPagamentoService service;
 
     private final UsuarioAuthService usuarioAuthService;
 

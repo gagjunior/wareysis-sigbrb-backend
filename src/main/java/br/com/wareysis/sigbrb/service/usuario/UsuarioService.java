@@ -14,7 +14,7 @@ import com.google.firebase.auth.UserRecord;
 
 import br.com.wareysis.sigbrb.dto.endpoint.PagedResponse;
 import br.com.wareysis.sigbrb.dto.endpoint.PaginationDto;
-import br.com.wareysis.sigbrb.dto.tipos.TipoPerfilDto;
+import br.com.wareysis.sigbrb.dto.tipos.TipoDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioCreateDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioResponseDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioUpdateDto;
@@ -140,7 +140,7 @@ public class UsuarioService {
 
     private UsuarioResponseDto createResponseDto(Usuario usuario, List<UsuarioPerfil> perfilList) {
 
-        List<TipoPerfilDto> tipoPerfilList = new ArrayList<>();
+        List<TipoDto> tipoPerfilList = new ArrayList<>();
 
         perfilList.forEach(perfil -> tipoPerfilList.add(tipoPerfilService.findById(perfil.getId().idPerfil())));
 

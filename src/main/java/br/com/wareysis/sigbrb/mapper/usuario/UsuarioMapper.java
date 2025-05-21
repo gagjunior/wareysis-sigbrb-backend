@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.firebase.auth.UserRecord;
 
-import br.com.wareysis.sigbrb.dto.tipos.TipoPerfilDto;
+import br.com.wareysis.sigbrb.dto.tipos.TipoDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioResponseDto;
 import br.com.wareysis.sigbrb.entity.usuario.Usuario;
 
@@ -26,7 +26,7 @@ public class UsuarioMapper {
                 .build();
     }
 
-    public UsuarioResponseDto toResponseDto(Usuario usuario, List<TipoPerfilDto> perfis) {
+    public UsuarioResponseDto toResponseDto(Usuario usuario, List<TipoDto> perfis) {
 
         return new UsuarioResponseDto(
                 usuario.getId(),

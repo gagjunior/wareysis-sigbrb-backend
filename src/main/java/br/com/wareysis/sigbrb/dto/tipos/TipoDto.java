@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record TipoPerfilDto(
+public record TipoDto(
 
         @NotBlank
         String id,

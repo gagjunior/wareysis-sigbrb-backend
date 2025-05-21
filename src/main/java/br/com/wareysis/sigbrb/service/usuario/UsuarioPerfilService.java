@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import br.com.wareysis.sigbrb.dto.tipos.TipoPerfilDto;
+import br.com.wareysis.sigbrb.dto.tipos.TipoDto;
 import br.com.wareysis.sigbrb.entity.usuario.UsuarioPerfil;
 import br.com.wareysis.sigbrb.entity.usuario.UsuarioPerfilId;
 import br.com.wareysis.sigbrb.exception.TipoPerfilException;
@@ -22,7 +22,7 @@ public class UsuarioPerfilService {
 
     private final UsuarioPerfilRepository repository;
 
-    public List<UsuarioPerfil> createPerfisUsuario(UUID idUsuario, List<TipoPerfilDto> perfis) {
+    public List<UsuarioPerfil> createPerfisUsuario(UUID idUsuario, List<TipoDto> perfis) {
 
         try {
 
