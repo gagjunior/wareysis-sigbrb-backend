@@ -6,7 +6,7 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record AtendimentoCreateDto(
+public record AtendimentoRequestDto(
 
         @NotNull(message = "ID do profissional é obrigatório")
         UUID idProfissional,
@@ -28,20 +28,5 @@ public record AtendimentoCreateDto(
 
         String idMetodoPagamento
 ) {
-
-    public AtendimentoCreateDto {
-
-        if (idStatusAtendimento == null) {
-            idStatusAtendimento = "AG";
-        }
-
-        if (idStatusPagamento == null) {
-            idStatusPagamento = "EA";
-        }
-
-        if (idMetodoPagamento == null) {
-            idMetodoPagamento = "DN";
-        }
-    }
 
 }

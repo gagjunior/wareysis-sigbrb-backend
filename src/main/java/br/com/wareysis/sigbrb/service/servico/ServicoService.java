@@ -7,12 +7,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.wareysis.sigbrb.core.enumerations.CrudOperations;
+import br.com.wareysis.sigbrb.core.log.dto.LogDto;
+import br.com.wareysis.sigbrb.core.log.dto.LogInterface;
+import br.com.wareysis.sigbrb.core.service.firebase.FirestoreLogService;
 import br.com.wareysis.sigbrb.dto.servico.ServicoDto;
 import br.com.wareysis.sigbrb.dto.servico.ServicoUpdateDto;
 import br.com.wareysis.sigbrb.entity.servico.Servico;
 import br.com.wareysis.sigbrb.exception.ServicoException;
 import br.com.wareysis.sigbrb.mapper.servico.ServicoMapper;
 import br.com.wareysis.sigbrb.repository.servico.ServicoRepository;
+import br.com.wareysis.sigbrb.service.usuario.UsuarioAuthService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +25,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ServicoService {
+public class ServicoService implements LogInterface {
 
     private final ServicoRepository repository;
 
     private final ServicoMapper mapper;
+
+    private final FirestoreLogService firestoreLogService;
+
+    private final UsuarioAuthService usuarioAuthService;
+
+    private static final String COLLECTION_NAME = "servicos";
 
     @Transactional
     public ServicoDto create(ServicoDto dto) {
@@ -36,7 +47,11 @@ public class ServicoService {
         Servico servico = mapper.toEntity(dto);
         servico.setDisponivel(true);
 
-        return mapper.toDto(repository.save(servico));
+        Servico newServico = repository.save(servico);
+
+        createLogFirebase(newServico, CrudOperations.CREATE);
+
+        return mapper.toDto(newServico);
     }
 
     @Transactional
@@ -46,6 +61,8 @@ public class ServicoService {
 
         updateServicoDetais(servico, dto);
 
+        createLogFirebase(servico, CrudOperations.UPDATE);
+
         return mapper.toDto(repository.save(servico));
 
     }
@@ -54,6 +71,8 @@ public class ServicoService {
     public void delete(UUID id) {
 
         Servico servico = findById(id);
+
+        createLogFirebase(servico, CrudOperations.DELETE);
 
         repository.delete(servico);
     }
@@ -99,4 +118,26 @@ public class ServicoService {
         }
     }
 
+    @Override
+    public void createLogFirebase(Object object, CrudOperations operacao) {
+
+        if (!(object instanceof Servico servico)) {
+            throw new ServicoException("Object não é uma instancia de Servico", HttpStatus.BAD_REQUEST);
+        }
+
+        UUID uuidLoggedInUser = usuarioAuthService.getLoggedInUserUuid();
+        LogDto logDto = new LogDto(
+                operacao.name(),
+                uuidLoggedInUser.toString(),
+                servico.getId().toString(),
+                COLLECTION_NAME,
+                servico
+        );
+        try {
+            firestoreLogService.addLogFirestore(logDto);
+        } catch (Exception e) {
+            throw new ServicoException("Não foi possivel salvar o log: %s".formatted(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }

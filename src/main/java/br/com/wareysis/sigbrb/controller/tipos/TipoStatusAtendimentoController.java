@@ -39,7 +39,7 @@ public class TipoStatusAtendimentoController {
         return ResponseEntity.ok(service.findByNome(nome));
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<TipoDto> findById(@PathVariable(name = "id") String id) {
 
         usuarioAuthService.adminUserIsRequired();
