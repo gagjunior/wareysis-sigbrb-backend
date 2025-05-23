@@ -13,11 +13,11 @@ import jakarta.persistence.Table;
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "TIPOS_PERFIL")
+@Table(name = "TIPOS_PERFIL_USUARIO")
 @Immutable
-public class TipoPerfil extends AbstractEntityTipo implements Serializable {
+public class TipoPerfilUsuario extends AbstractEntityTipo implements Serializable {
 
-    public TipoPerfil(String id, String nome) {
+    public TipoPerfilUsuario(String id, String nome) {
 
         super(id, nome);
     }

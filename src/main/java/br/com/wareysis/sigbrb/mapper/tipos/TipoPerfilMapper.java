@@ -3,14 +3,14 @@ package br.com.wareysis.sigbrb.mapper.tipos;
 import org.springframework.stereotype.Component;
 
 import br.com.wareysis.sigbrb.dto.tipos.TipoDto;
-import br.com.wareysis.sigbrb.entity.tipos.TipoPerfil;
+import br.com.wareysis.sigbrb.entity.tipos.TipoPerfilUsuario;
 
 @Component
-public class TipoPerfilMapper extends AbstractTipoMapper<TipoPerfil> {
+public class TipoPerfilMapper extends AbstractTipoMapper<TipoPerfilUsuario> {
 
     @Override
-    public TipoPerfil toEntity(TipoDto dto) {
+    public TipoPerfilUsuario toEntity(TipoDto dto) {
 
-        return new TipoPerfil(dto.id(), dto.nome());
+        return new TipoPerfilUsuario(dto.id(), dto.nome());
     }
 }
