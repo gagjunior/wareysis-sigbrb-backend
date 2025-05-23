@@ -2,6 +2,7 @@ package br.com.wareysis.sigbrb.exception;
 
 import java.time.LocalDateTime;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,15 +18,27 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TipoPerfilException.class)
-    public ResponseEntity<ExceptionResponseDto> handleUsuarioException(TipoPerfilException e) {
+    public ResponseEntity<ExceptionResponseDto> handleTipoPerfilException(TipoPerfilException e) {
 
         return buildResponseEntity(e.getStatus(), e.getMessage());
     }
 
     @ExceptionHandler(ServicoException.class)
-    public ResponseEntity<ExceptionResponseDto> handleUsuarioException(ServicoException e) {
+    public ResponseEntity<ExceptionResponseDto> handleServicoException(ServicoException e) {
 
         return buildResponseEntity(e.getStatus(), e.getMessage());
+    }
+
+    @ExceptionHandler(AtendimentoException.class)
+    public ResponseEntity<ExceptionResponseDto> handleAtendimentoException(AtendimentoException e) {
+
+        return buildResponseEntity(e.getStatus(), e.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionResponseDto> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     private ResponseEntity<ExceptionResponseDto> buildResponseEntity(HttpStatus status, String message) {
