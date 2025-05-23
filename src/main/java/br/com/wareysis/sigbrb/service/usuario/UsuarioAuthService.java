@@ -20,7 +20,7 @@ public class UsuarioAuthService {
 
     public void adminUserIsRequired() {
 
-        UUID loggedInUserId = getLoggedInUserId();
+        UUID loggedInUserId = getLoggedInUserUuid();
 
         if (!loggedInUserIsAdmin()) {
             throw new UsuarioException("Acesso negado para usuário: %s".formatted(loggedInUserId), HttpStatus.UNAUTHORIZED);
@@ -28,15 +28,7 @@ public class UsuarioAuthService {
 
     }
 
-    private boolean loggedInUserIsAdmin() {
-
-        UUID loggedInUserId = getLoggedInUserId();
-        UsuarioPerfilId usuarioPerfilId = new UsuarioPerfilId(loggedInUserId, "ADM");
-
-        return usuarioPerfilService.existsUsuarioPerfilById(usuarioPerfilId);
-    }
-
-    private UUID getLoggedInUserId() {
+    public UUID getLoggedInUserUuid() {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -46,6 +38,14 @@ public class UsuarioAuthService {
 
         return UUID.fromString(auth.getPrincipal().toString());
 
+    }
+
+    private boolean loggedInUserIsAdmin() {
+
+        UUID loggedInUserId = getLoggedInUserUuid();
+        UsuarioPerfilId usuarioPerfilId = new UsuarioPerfilId(loggedInUserId, "ADM");
+
+        return usuarioPerfilService.existsUsuarioPerfilById(usuarioPerfilId);
     }
 
 }

@@ -1,4 +1,4 @@
-package br.com.wareysis.sigbrb.service.firebase;
+package br.com.wareysis.sigbrb.core.service.firebase;
 
 import java.util.UUID;
 

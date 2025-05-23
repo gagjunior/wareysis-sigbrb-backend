@@ -73,7 +73,7 @@ public class ServicoService {
         return mapper.toDto(findById(UUID.fromString(id)));
     }
 
-    private Servico findById(UUID id) {
+    public Servico findById(UUID id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new ServicoException("Serviço com ID: %s não existe".formatted(id), HttpStatus.BAD_REQUEST));

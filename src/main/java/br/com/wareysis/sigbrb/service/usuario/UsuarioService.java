@@ -20,10 +20,11 @@ import br.com.wareysis.sigbrb.dto.usuario.UsuarioResponseDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioUpdateDto;
 import br.com.wareysis.sigbrb.entity.usuario.Usuario;
 import br.com.wareysis.sigbrb.entity.usuario.UsuarioPerfil;
+import br.com.wareysis.sigbrb.entity.usuario.UsuarioPerfilId;
 import br.com.wareysis.sigbrb.exception.UsuarioException;
 import br.com.wareysis.sigbrb.mapper.usuario.UsuarioMapper;
 import br.com.wareysis.sigbrb.repository.usuario.UsuarioRepository;
-import br.com.wareysis.sigbrb.service.firebase.FirebaseUserService;
+import br.com.wareysis.sigbrb.core.service.firebase.FirebaseUserService;
 import br.com.wareysis.sigbrb.service.tipos.TipoPerfilService;
 
 import lombok.RequiredArgsConstructor;
@@ -130,12 +131,25 @@ public class UsuarioService {
         return createResponseDto(usuario, usuarioPerfilService.findPerfisByIdUsuario(usuario.getId()));
     }
 
-    public UsuarioResponseDto findById(UUID id) {
+    public UsuarioResponseDto findById(String id) {
 
-        Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new UsuarioException("Usuário com id: %s não existe".formatted(id), HttpStatus.BAD_REQUEST));
+        Usuario usuario = findById(UUID.fromString(id));
 
         return createResponseDto(usuario, usuarioPerfilService.findPerfisByIdUsuario(usuario.getId()));
+    }
+
+    public Usuario findById(UUID id) {
+
+        return repository.findById(id)
+                .orElseThrow(() -> new UsuarioException("Usuário com id: %s não existe".formatted(id), HttpStatus.BAD_REQUEST));
+
+    }
+
+    public boolean isProfUser(UUID idProfissional) {
+
+        UsuarioPerfilId usuarioPerfilId = new UsuarioPerfilId(idProfissional, "PROF");
+
+        return usuarioPerfilService.existsUsuarioPerfilById(usuarioPerfilId);
     }
 
     private UsuarioResponseDto createResponseDto(Usuario usuario, List<UsuarioPerfil> perfilList) {

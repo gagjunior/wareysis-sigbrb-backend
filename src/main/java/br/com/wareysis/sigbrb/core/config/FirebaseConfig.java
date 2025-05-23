@@ -10,17 +10,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
 import com.google.firebase.ErrorCode;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
 
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.annotation.PostConstruct;
 
-@Configuration
 @Slf4j
+@Configuration
 public class FirebaseConfig {
 
     @Value("${firebase.service-account.path}")
@@ -47,11 +49,19 @@ public class FirebaseConfig {
                 FirebaseApp.initializeApp(options);
                 log.info("FIREBASE: Firebase App initialized");
 
+                Firestore db = FirestoreClient.getFirestore();
+                log.info("FIREBASE: Firestore initialized");
+
             }
 
         } catch (IOException e) {
             throw new FirebaseException(ErrorCode.INTERNAL, "FIREBASE: Error initializing firebase" + e.getMessage(), null);
         }
 
+    }
+
+    public static Firestore getDb() {
+
+        return FirestoreClient.getFirestore();
     }
 }

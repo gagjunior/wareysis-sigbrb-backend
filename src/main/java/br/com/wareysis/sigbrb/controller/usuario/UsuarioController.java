@@ -1,7 +1,5 @@
 package br.com.wareysis.sigbrb.controller.usuario;
 
-import java.util.UUID;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -94,7 +92,7 @@ public class UsuarioController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(service.findById(UUID.fromString(id)));
+                .body(service.findById(id));
     }
 
     @GetMapping("/email/{email}")
