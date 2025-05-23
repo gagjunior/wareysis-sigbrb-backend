@@ -1,4 +1,4 @@
-package br.com.wareysis.sigbrb.core.dto.log;
+package br.com.wareysis.sigbrb.core.log.dto;
 
 public record LogDto(
         String operacao,

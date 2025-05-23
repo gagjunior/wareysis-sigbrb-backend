@@ -42,7 +42,7 @@ public class UsuarioPerfilService {
 
             });
 
-            return repository.saveAll(usuarioPerfilList);
+            return repository.saveAllAndFlush(usuarioPerfilList);
 
         } catch (Exception e) {
 

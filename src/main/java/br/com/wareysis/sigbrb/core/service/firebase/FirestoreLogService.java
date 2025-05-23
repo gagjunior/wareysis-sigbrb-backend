@@ -13,7 +13,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.WriteResult;
 
 import br.com.wareysis.sigbrb.core.config.FirebaseConfig;
-import br.com.wareysis.sigbrb.core.dto.log.LogDto;
+import br.com.wareysis.sigbrb.core.log.dto.LogDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

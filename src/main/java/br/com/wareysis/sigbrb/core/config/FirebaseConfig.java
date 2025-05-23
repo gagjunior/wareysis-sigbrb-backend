@@ -49,7 +49,7 @@ public class FirebaseConfig {
                 FirebaseApp.initializeApp(options);
                 log.info("FIREBASE: Firebase App initialized");
 
-                Firestore db = FirestoreClient.getFirestore();
+                FirestoreClient.getFirestore();
                 log.info("FIREBASE: Firestore initialized");
 
             }

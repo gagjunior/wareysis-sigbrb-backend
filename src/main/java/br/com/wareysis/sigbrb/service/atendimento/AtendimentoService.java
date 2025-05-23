@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.wareysis.sigbrb.core.dto.log.LogDto;
+import br.com.wareysis.sigbrb.core.enumerations.CrudOperations;
+import br.com.wareysis.sigbrb.core.log.dto.LogDto;
+import br.com.wareysis.sigbrb.core.log.dto.LogInterface;
 import br.com.wareysis.sigbrb.core.service.firebase.FirestoreLogService;
 import br.com.wareysis.sigbrb.dto.atentimento.AtendimentoCreateDto;
 import br.com.wareysis.sigbrb.entity.atendimento.Atendimento;
@@ -23,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AtendimentoService {
+public class AtendimentoService implements LogInterface {
 
     private final AtendimentoRepository repository;
 
@@ -44,8 +46,7 @@ public class AtendimentoService {
 
         Atendimento atendimento = persist(createDto);
 
-        UUID uuidLoggedInUser = usuarioAuthService.getLoggedInUserUuid();
-        createLogFirebase(atendimento, uuidLoggedInUser, "CREATE");
+        createLogFirebase(atendimento, CrudOperations.CREATE);
 
         return atendimento;
 
@@ -69,12 +70,16 @@ public class AtendimentoService {
         }
     }
 
-    private void createLogFirebase(Atendimento atendimento, UUID uuidLoggedInUser, String operacao) {
+    @Override
+    public void createLogFirebase(Object object, CrudOperations operacao) {
+
+        UUID uuidLoggedInUser = usuarioAuthService.getLoggedInUserUuid();
+        Atendimento atendimento = (Atendimento) object;
 
         try {
 
             LogDto logDto = new LogDto(
-                    operacao,
+                    operacao.name(),
                     uuidLoggedInUser.toString(),
                     atendimento.getId().toString(),
                     COLLECTION_NAME,
@@ -86,6 +91,7 @@ public class AtendimentoService {
         } catch (Exception e) {
             throw new AtendimentoException("Não foi possivel salvar o log: %s".formatted(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
 }

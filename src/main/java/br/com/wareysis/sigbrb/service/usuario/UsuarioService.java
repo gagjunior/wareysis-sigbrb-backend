@@ -12,6 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.auth.UserRecord;
 
+import br.com.wareysis.sigbrb.core.enumerations.CrudOperations;
+import br.com.wareysis.sigbrb.core.log.dto.LogDto;
+import br.com.wareysis.sigbrb.core.log.dto.LogInterface;
+import br.com.wareysis.sigbrb.core.service.firebase.FirebaseUserService;
+import br.com.wareysis.sigbrb.core.service.firebase.FirestoreLogService;
 import br.com.wareysis.sigbrb.dto.endpoint.PagedResponse;
 import br.com.wareysis.sigbrb.dto.endpoint.PaginationDto;
 import br.com.wareysis.sigbrb.dto.tipos.TipoDto;
@@ -24,14 +29,13 @@ import br.com.wareysis.sigbrb.entity.usuario.UsuarioPerfilId;
 import br.com.wareysis.sigbrb.exception.UsuarioException;
 import br.com.wareysis.sigbrb.mapper.usuario.UsuarioMapper;
 import br.com.wareysis.sigbrb.repository.usuario.UsuarioRepository;
-import br.com.wareysis.sigbrb.core.service.firebase.FirebaseUserService;
 import br.com.wareysis.sigbrb.service.tipos.TipoPerfilService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioService {
+public class UsuarioService implements LogInterface {
 
     private final UsuarioRepository repository;
 
@@ -43,6 +47,12 @@ public class UsuarioService {
 
     private final TipoPerfilService tipoPerfilService;
 
+    private final FirestoreLogService firestoreLogService;
+
+    private final UsuarioAuthService usuarioAuthService;
+
+    private static final String COLLECTION_NAME = "usuarios";
+
     @Transactional
     public UsuarioResponseDto create(UsuarioCreateDto dto) {
 
@@ -50,9 +60,11 @@ public class UsuarioService {
 
         try {
 
-            Usuario usuario = repository.save(mapper.fromUserRecord(userRecord));
+            Usuario usuario = repository.saveAndFlush(mapper.fromUserRecord(userRecord));
 
             List<UsuarioPerfil> perfilList = usuarioPerfilService.createPerfisUsuario(usuario.getId(), dto.perfis());
+
+            createLogFirebase(usuario, CrudOperations.CREATE);
 
             return createResponseDto(usuario, perfilList);
 
@@ -86,7 +98,9 @@ public class UsuarioService {
             usuario.setAlterarSenha(dto.alterarSenha());
         }
 
-        repository.save(usuario);
+        repository.saveAndFlush(usuario);
+
+        createLogFirebase(usuario, CrudOperations.UPDATE);
 
         return createResponseDto(usuario, usuarioPerfilService.findPerfisByIdUsuario(usuario.getId()));
 
@@ -99,6 +113,8 @@ public class UsuarioService {
                 .orElseThrow(() -> new UsuarioException("Usuário com ID: %s não localizado".formatted(id), HttpStatus.BAD_REQUEST));
 
         firebaseUserService.deleteUserInFirebase(usuario.getEmail());
+
+        createLogFirebase(usuario, CrudOperations.DELETE);
 
         repository.deleteById(id);
 
@@ -150,6 +166,33 @@ public class UsuarioService {
         UsuarioPerfilId usuarioPerfilId = new UsuarioPerfilId(idProfissional, "PROF");
 
         return usuarioPerfilService.existsUsuarioPerfilById(usuarioPerfilId);
+    }
+
+    @Override
+    public void createLogFirebase(Object object, CrudOperations operacao) {
+
+        if (!(object instanceof Usuario usuario)) {
+            throw new UsuarioException("Object não é uma instancia de Usuario: %s".formatted(object.getClass().getName()), HttpStatus.BAD_REQUEST);
+        }
+
+        UUID uuidLoggedInUser = operacao.equals(CrudOperations.CREATE) ? usuario.getId() : usuarioAuthService.getLoggedInUserUuid();
+
+        try {
+
+            LogDto logDto = new LogDto(
+                    operacao.name(),
+                    uuidLoggedInUser.toString(),
+                    usuario.getId().toString(),
+                    COLLECTION_NAME,
+                    usuario
+            );
+
+            firestoreLogService.addLogFirestore(logDto);
+
+        } catch (Exception e) {
+            throw new UsuarioException("Não foi possivel salvar o log: %s".formatted(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     private UsuarioResponseDto createResponseDto(Usuario usuario, List<UsuarioPerfil> perfilList) {
