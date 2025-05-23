@@ -1,6 +1,7 @@
 package br.com.wareysis.sigbrb.service.atendimento;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -67,10 +68,36 @@ public class AtendimentoService implements LogInterface {
 
     }
 
+    @Transactional
+    public void delete(String id) {
+
+        Atendimento atendimento = findById(UUID.fromString(id));
+
+        repository.delete(atendimento);
+
+        createLogFirebase(atendimento, CrudOperations.DELETE);
+
+    }
+
     public Atendimento findById(UUID id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new AtendimentoException("Atendimento com ID: %s não existe".formatted(id), HttpStatus.BAD_REQUEST));
+    }
+
+    public List<Atendimento> findAll() {
+
+        return repository.findAll();
+    }
+
+    public List<Atendimento> findByIdServico(String idServico) {
+
+        return repository.findAllByIdServico(UUID.fromString(idServico));
+    }
+
+    public List<Atendimento> findByIdProfissional(String idProfissional) {
+
+        return repository.findAllByIdProfissional(UUID.fromString(idProfissional));
     }
 
     @Override
