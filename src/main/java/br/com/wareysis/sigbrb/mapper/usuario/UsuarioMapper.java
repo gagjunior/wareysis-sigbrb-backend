@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.google.firebase.auth.UserRecord;
 
 import br.com.wareysis.sigbrb.dto.tipos.TipoDto;
+import br.com.wareysis.sigbrb.dto.usuario.ProfissionalAtendimentoDto;
 import br.com.wareysis.sigbrb.dto.usuario.UsuarioResponseDto;
 import br.com.wareysis.sigbrb.entity.usuario.Usuario;
 
@@ -40,6 +41,14 @@ public class UsuarioMapper {
                 perfis,
                 usuario.getDhCriacao(),
                 usuario.getDhAlteracao()
+        );
+    }
+
+    public ProfissionalAtendimentoDto toProfissionalAtendimentoDto(Usuario usuario) {
+
+        return new ProfissionalAtendimentoDto(
+                usuario.getId(),
+                usuario.getNomeCompleto()
         );
     }
 

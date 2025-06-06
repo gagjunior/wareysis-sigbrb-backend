@@ -3,6 +3,9 @@ package br.com.wareysis.sigbrb.mapper.atendimento;
 import org.springframework.stereotype.Component;
 
 import br.com.wareysis.sigbrb.dto.atentimento.AtendimentoRequestDto;
+import br.com.wareysis.sigbrb.dto.atentimento.AtendimentoResponseDto;
+import br.com.wareysis.sigbrb.dto.servico.ServicoAtendimentoDto;
+import br.com.wareysis.sigbrb.dto.usuario.ProfissionalAtendimentoDto;
 import br.com.wareysis.sigbrb.entity.atendimento.Atendimento;
 
 @Component
@@ -21,6 +24,24 @@ public class AtendimentoMapper {
                 .idMetodoPagamento(createDto.idMetodoPagamento() == null ? "DN" : createDto.idMetodoPagamento())
                 .build();
 
+    }
+
+    public AtendimentoResponseDto toResponseDto(Atendimento atendimento, ProfissionalAtendimentoDto profissional, ServicoAtendimentoDto servico) {
+
+        return new AtendimentoResponseDto(
+                atendimento.getId(),
+                profissional,
+                servico,
+                atendimento.getDhInicio(),
+                atendimento.getDhFim(),
+                atendimento.getIdCliente(),
+                atendimento.getNomeCliente(),
+                atendimento.getIdStatusAtendimento(),
+                atendimento.getIdStatusPagamento(),
+                atendimento.getIdMetodoPagamento(),
+                atendimento.getDhCriacao(),
+                atendimento.getDhAlteracao()
+        );
     }
 
 }

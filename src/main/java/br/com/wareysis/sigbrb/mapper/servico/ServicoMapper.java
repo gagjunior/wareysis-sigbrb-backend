@@ -2,6 +2,7 @@ package br.com.wareysis.sigbrb.mapper.servico;
 
 import org.springframework.stereotype.Component;
 
+import br.com.wareysis.sigbrb.dto.servico.ServicoAtendimentoDto;
 import br.com.wareysis.sigbrb.dto.servico.ServicoDto;
 import br.com.wareysis.sigbrb.entity.servico.Servico;
 
@@ -29,6 +30,16 @@ public class ServicoMapper {
                 servico.getDisponivel(),
                 servico.getDhCriacao(),
                 servico.getDhAlteracao()
+        );
+    }
+
+    public ServicoAtendimentoDto toAtendimentoDto(Servico servico) {
+
+        return new ServicoAtendimentoDto(
+                servico.getId(),
+                servico.getNome(),
+                servico.getValor(),
+                servico.getTempo()
         );
     }
 

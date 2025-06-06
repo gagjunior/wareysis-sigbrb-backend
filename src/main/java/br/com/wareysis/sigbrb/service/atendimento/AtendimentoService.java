@@ -13,10 +13,15 @@ import br.com.wareysis.sigbrb.core.log.dto.LogDto;
 import br.com.wareysis.sigbrb.core.log.dto.LogInterface;
 import br.com.wareysis.sigbrb.core.service.firebase.FirestoreLogService;
 import br.com.wareysis.sigbrb.dto.atentimento.AtendimentoRequestDto;
+import br.com.wareysis.sigbrb.dto.atentimento.AtendimentoResponseDto;
+import br.com.wareysis.sigbrb.dto.servico.ServicoAtendimentoDto;
+import br.com.wareysis.sigbrb.dto.usuario.ProfissionalAtendimentoDto;
 import br.com.wareysis.sigbrb.entity.atendimento.Atendimento;
 import br.com.wareysis.sigbrb.entity.servico.Servico;
 import br.com.wareysis.sigbrb.exception.AtendimentoException;
 import br.com.wareysis.sigbrb.mapper.atendimento.AtendimentoMapper;
+import br.com.wareysis.sigbrb.mapper.servico.ServicoMapper;
+import br.com.wareysis.sigbrb.mapper.usuario.UsuarioMapper;
 import br.com.wareysis.sigbrb.repository.atendimento.AtendimentoRepository;
 import br.com.wareysis.sigbrb.service.servico.ServicoService;
 import br.com.wareysis.sigbrb.service.usuario.UsuarioAuthService;
@@ -42,21 +47,25 @@ public class AtendimentoService implements LogInterface {
 
     private final FirestoreLogService firestoreLogService;
 
+    private final ServicoMapper servicoMapper;
+
     private static final String COLLECTION_NAME = "atendimentos";
 
+    private final UsuarioMapper usuarioMapper;
+
     @Transactional
-    public Atendimento create(AtendimentoRequestDto createDto) {
+    public AtendimentoResponseDto create(AtendimentoRequestDto createDto) {
 
         Atendimento atendimento = persist(createDto);
 
         createLogFirebase(atendimento, CrudOperations.CREATE);
 
-        return atendimento;
+        return createResponseDto(atendimento);
 
     }
 
     @Transactional
-    public Atendimento update(String id, AtendimentoRequestDto requestDto) {
+    public AtendimentoResponseDto update(String id, AtendimentoRequestDto requestDto) {
 
         Atendimento atendimento = findById(UUID.fromString(id));
 
@@ -64,7 +73,7 @@ public class AtendimentoService implements LogInterface {
 
         createLogFirebase(atendimento, CrudOperations.UPDATE);
 
-        return repository.save(atendimento);
+        return createResponseDto(repository.save(atendimento));
 
     }
 
@@ -79,25 +88,44 @@ public class AtendimentoService implements LogInterface {
 
     }
 
-    public Atendimento findById(UUID id) {
+    private Atendimento findById(UUID id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new AtendimentoException("Atendimento com ID: %s não existe".formatted(id), HttpStatus.BAD_REQUEST));
     }
 
-    public List<Atendimento> findAll() {
+    public AtendimentoResponseDto findById(String id) {
 
-        return repository.findAll();
+        Atendimento atendimento = repository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new AtendimentoException("Atendimento com ID: %s não existe".formatted(id), HttpStatus.BAD_REQUEST));
+
+        return createResponseDto(atendimento);
+
     }
 
-    public List<Atendimento> findByIdServico(String idServico) {
+    public List<AtendimentoResponseDto> findAll() {
 
-        return repository.findAllByIdServico(UUID.fromString(idServico));
+        return repository.findAll().parallelStream().map(this::createResponseDto).toList();
     }
 
-    public List<Atendimento> findByIdProfissional(String idProfissional) {
+    public List<AtendimentoResponseDto> findByIdServico(String idServico) {
 
-        return repository.findAllByIdProfissional(UUID.fromString(idProfissional));
+        return repository.findAllByIdServico(UUID.fromString(idServico)).parallelStream().map(this::createResponseDto).toList();
+    }
+
+    public List<AtendimentoResponseDto> findByIdProfissional(String idProfissional) {
+
+        return repository.findAllByIdProfissional(UUID.fromString(idProfissional)).parallelStream().map(this::createResponseDto).toList();
+    }
+
+    public List<AtendimentoResponseDto> findAllByNomeServicoContainingIgnoreCase(String nomeServico) {
+
+        return repository.findAllByNomeServicoContainingIgnoreCase(nomeServico).parallelStream().map(this::createResponseDto).toList();
+    }
+
+    public List<AtendimentoResponseDto> findByNomeProfissionalContainingIgnoreCase(String nomeProfissional) {
+
+        return repository.findByNomeProfissionalContainingIgnoreCase(nomeProfissional).parallelStream().map(this::createResponseDto).toList();
     }
 
     @Override
@@ -121,6 +149,15 @@ public class AtendimentoService implements LogInterface {
         } catch (Exception e) {
             throw new AtendimentoException("Não foi possivel salvar o log: %s".formatted(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+    }
+
+    private AtendimentoResponseDto createResponseDto(Atendimento atendimento) {
+
+        ServicoAtendimentoDto servico = servicoMapper.toAtendimentoDto(servicoService.findById(atendimento.getIdServico()));
+        ProfissionalAtendimentoDto profissional = usuarioMapper.toProfissionalAtendimentoDto(usuarioService.findById(atendimento.getIdProfissional()));
+
+        return mapper.toResponseDto(atendimento, profissional, servico);
 
     }
 
